@@ -1,14 +1,43 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native' 
+import { TodoContext } from '../global/global-states'
 
-const Task = ({text}) => {
+const Task = ({text, state, index}) => {
+
+    const { todoList, setTodo } = useContext(TodoContext) 
+    const [ todoState, setTodoState ] = useState(false)
+    
+    useEffect(() => { 
+        {state == "undone" ? setTodoState(false) : setTodoState(true)}
+    }, [state])
+
+    const removeTask = () => {
+		let todoListCopy = [...todoList]
+		todoListCopy.splice(index, 1); 
+		setTodo(todoListCopy);
+	}
+    
+    const completeTask = () => { 
+        let todoListCopy = [...todoList]
+        if(state == "undone") { 
+            todoListCopy[index].state = "done"
+        } else {
+            todoListCopy[index].state = "undone"
+        }
+        setTodo(todoListCopy)
+    }
+
     return (
         <View style={styles.item}>
             <View style={styles.itemLeft}>
-                <View style={styles.square}></View>
-                <Text style={styles.itemText}>{text}</Text>
+                <TouchableOpacity onPress={() => removeTask()}>
+                    <View style={styles.square}></View>
+                </TouchableOpacity>
+                <Text style={todoState ? {...styles.itemText, ...styles.textDone}: styles.itemText}>{text}</Text>
             </View>
-            <View style={styles.circular}></View>
+            <TouchableOpacity onPress={() => completeTask()}>
+                <View style={todoState ? {...styles.circular, ...styles.done} : styles.circular}></View>
+            </TouchableOpacity>
         </View>
     )
 }
@@ -40,12 +69,20 @@ const styles = StyleSheet.create({
         maxWidth: '80%', 
     },
     circular: {
-        width: 12, 
-        height: 12,
+        width: 20, 
+        height: 20,
         borderColor: '#F96300', 
         borderWidth: 2, 
-        borderRadius: 3
+        borderRadius: 20
     },
+    done: {
+        backgroundColor: '#F96300',
+        opacity: 0.5
+    },
+    textDone: {
+        textDecorationLine: 'line-through',
+        opacity: 0.5
+    }
 })
 
 export default Task

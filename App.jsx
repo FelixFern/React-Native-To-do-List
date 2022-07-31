@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View, Keyboard } from 'react-native';
 import Task from './components/Task';
+import { TodoContext } from './global/global-states';
 
 export default function App() {
 
@@ -9,18 +10,12 @@ export default function App() {
 	
 	const handleTask = () => {
 		Keyboard.dismiss()
-		setTodo([...todoList, task])
+		setTodo([...todoList, {"title": task, "state": "undone"}])
 		setTask(null)
 	}
-	
-	const completeTask = (index) => {
-		let todoListCopy = [...todoList]
-		todoListCopy.splice(index, 1); 
-		setTodo(todoListCopy);
-	}
-	
-	
+
 	return (
+		<TodoContext.Provider value={{todoList, setTodo}}>
 		<View style={styles.container}>
 			<View style={styles.taskWrapper}>
 				<Text style={styles.sectionTitle}>Today's Tasks</Text>
@@ -28,11 +23,7 @@ export default function App() {
 					{/* Task List */}
 					{todoList.map((val, i) => {
 						return (
-							<TouchableOpacity onPress={() => {
-								completeTask(i)
-							}}>
-								<Task text={val} key={i}></Task>
-							</TouchableOpacity>
+							<Task key={i} index={i} text={val.title} state={val.state}></Task>
 						)
 					})}
 				</View>
@@ -54,6 +45,7 @@ export default function App() {
 				</View>
 			</KeyboardAvoidingView>
 		</View>
+		</TodoContext.Provider>
 	);
 }
 
